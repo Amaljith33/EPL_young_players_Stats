@@ -7,17 +7,24 @@ Original file is located at
     https://colab.research.google.com/drive/1LdNJBYVAaiorH_LM3qOftvz2ZTNM5lVh
 """
 
-from google.colab import drive
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import os
-from sklearn.model_selection import train_test_split
+from google.colab import drive
 from sklearn.preprocessing import StandardScaler
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+from sklearn.model_selection import train_test_split, RandomizedSearchCV, GridSearchCV
+from sklearn.metrics import mean_absolute_error, r2_score
+from sklearn.model_selection import RandomizedSearchCV
+from xgboost import XGBRegressor
+from sklearn.svm import SVR
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout
+
 
 # Load a Excel file from Google Drive
 drive.mount('/content/drive')
@@ -182,50 +189,43 @@ U25_Out_fld_plyr_numeric.fillna(0, inplace=True)
 U25_GK_numeric.replace([np.inf, -np.inf], np.nan, inplace=True)
 U25_GK_numeric.fillna(0, inplace=True)
 
-# Histograms for U23_Out_fld_plyr_numeric
+# Histograms for U25_Out_fld_plyr_numeric
 U25_Out_fld_plyr_numeric.hist(figsize=(15, 10), bins=30, edgecolor='black')
-plt.suptitle('Distribution of Features in U23_Out_fld_plyr')
-plt.savefig(drive_path + 'U23_Out_fld_plyr_histograms.png')
+plt.suptitle('Distribution of Features in U25_Out_fld_plyr')
+plt.savefig(drive_path + 'U25_Out_fld_plyr_histograms.png')
 plt.show()
 
-# Histograms for U23_GK_numeric
+# Histograms for U25_GK_numeric
 U25_GK_numeric.hist(figsize=(15, 10), bins=30, edgecolor='black')
 plt.suptitle('Distribution of Features in U23_GK')
-plt.savefig(drive_path + 'U23_GK_histograms.png')
+plt.savefig(drive_path + 'U25_GK_histograms.png')
 plt.show()
-# Correlation matrix for U23_Out_fld_plyr_numeric
+# Correlation matrix for U25_Out_fld_plyr_numeric
 plt.figure(figsize=(12, 8))
 sns.heatmap(U25_Out_fld_plyr_numeric.corr(), annot=True, cmap='coolwarm',
             fmt='.2f', linewidths=0.5)
-plt.title('Correlation Matrix - U23_Out_fld_plyr_numeric')
-plt.savefig(drive_path + 'U23_Out_fld_plyr_correlation_matrix.png')
+plt.title('Correlation Matrix - U25_Out_fld_plyr_numeric')
+plt.savefig(drive_path + 'U25_Out_fld_plyr_correlation_matrix.png')
 plt.show()
 
-# Correlation matrix for U23_GK_numeric
+# Correlation matrix for U25_GK_numeric
 plt.figure(figsize=(12, 8))
 sns.heatmap(U25_GK_numeric.corr(), annot=True, cmap='coolwarm',
             fmt='.2f', linewidths=0.5)
 plt.title('Correlation Matrix - U25_GK_numeric')
 plt.savefig(drive_path + 'U25_GK_correlation_matrix.png')
 plt.show()
-# Pairplot for U23_Out_fld_plyr_numeric
+# Pairplot for U25_Out_fld_plyr_numeric
 sns.pairplot(U25_Out_fld_plyr_numeric)
 plt.suptitle('Pairwise Relationships - U25_Out_fld_plyr_numeric', y=1.02)
 plt.savefig(drive_path + 'U25_Out_fld_plyr_pairplot.png')
 plt.show()
 
-# Pairplot for U23_GK_numeric
+# Pairplot for U25_GK_numeric
 sns.pairplot(U25_GK_numeric)
 plt.suptitle('Pairwise Relationships - U25_GK_numeric', y=1.02)
 plt.savefig(drive_path +'U25_GK_pairplot.png')
 plt.show()
-
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
-from sklearn.preprocessing import StandardScaler
-from sklearn.multioutput import MultiOutputRegressor
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_absolute_error, r2_score
-import numpy as np
 
 # Replace infinite values and fill NaNs with 0
 U25_Out_fld_plyr.replace([np.inf, -np.inf], np.nan, inplace=True)
@@ -350,11 +350,6 @@ RF_pred_GK = U25_GK[RF_final_GK]
 # Save the predictions to Excel
 RF_pred_GK.to_excel('/content/drive/My Drive/U23_GK_Predictions_All_Targets.xlsx', index=False)
 
-from sklearn.model_selection import RandomizedSearchCV
-from xgboost import XGBRegressor
-from sklearn.multioutput import MultiOutputRegressor
-from sklearn.metrics import mean_absolute_error, r2_score
-
 # Hyperparameter grid for XGBoost
 param_dist = {
     'n_estimators': [100, 200, 300, 400, 500],
@@ -459,14 +454,6 @@ xgb_pred_GK = U25_GK[xgb_final_GK]
 
 # Save the predictions to Excel
 xgb_pred_GK.to_excel('/content/drive/My Drive/U23_GK_XGBoost_Predictions.xlsx', index=False)
-
-import numpy as np
-import pandas as pd
-from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVR
-from sklearn.multioutput import MultiOutputRegressor
-from sklearn.metrics import mean_absolute_error, r2_score
 
 # Replace infinite values and fill NaNs with 0
 U25_Out_fld_plyr.replace([np.inf, -np.inf], np.nan, inplace=True)
@@ -589,13 +576,6 @@ svr_final_gk = ['Player', 'Age_x', 'Predicted_Save_Impact', 'Predicted_Saves_per
 svr_pred_gk = U25_GK[svr_final_gk]
 svr_pred_gk.to_excel('/content/drive/My Drive/U23_GK_SVR_Predictions.xlsx', index=False)
 
-import numpy as np
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import mean_absolute_error, r2_score
-
 # Replace infinite values and fill NaNs with 0
 U25_Out_fld_plyr.replace([np.inf, -np.inf], np.nan, inplace=True)
 U25_Out_fld_plyr.fillna(0, inplace=True)
@@ -713,9 +693,6 @@ nn_final_gk = ['Player', 'Age_x', 'Predicted_Save_Impact', 'Predicted_Saves_per_
 
 nn_pred_gk = U25_GK[nn_final_gk]
 nn_pred_gk.to_excel('/content/drive/My Drive/U23_GK_NN_Predictions.xlsx', index=False)
-
-import pandas as pd
-from sklearn.metrics import mean_absolute_error, r2_score
 
 # Assuming you have these DataFrames with predictions:
 # rf_pred_ofp, xgb_pred_ofp, nn_pred_ofp, svr_pred_ofp for outfield players
